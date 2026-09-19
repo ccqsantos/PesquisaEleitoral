@@ -1,6 +1,7 @@
 package com.example.pesquisaeleitoral
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Spinner
@@ -27,6 +28,11 @@ class PesquisaEspecificaActivity : AppCompatActivity() {
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCandidatos.adapter = adapter
+
+        val intent = Intent(this, ProblemasActivity::class.java)
+        intent.putExtra("voto_aberto", getIntent().getStringExtra("voto_aberto"))
+        intent.putExtra("voto_estimulado", spinnerCandidatos.selectedItem.toString())
+        startActivity(intent)
 
 
     }

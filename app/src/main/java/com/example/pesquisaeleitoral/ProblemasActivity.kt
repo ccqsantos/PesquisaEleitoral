@@ -1,8 +1,10 @@
 package com.example.pesquisaeleitoral
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.Spinner
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -28,7 +30,15 @@ class ProblemasActivity : AppCompatActivity() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerProblema.adapter = adapter
 
-
-
+        findViewById<Button>(R.id.btEnviar3).setOnClickListener {
+            val intent = Intent(this, DadosdoUserActivity::class.java)
+            intent.putExtra("voto_aberto", getIntent().getStringExtra("voto_aberto"))
+            intent.putExtra("voto_estimulado", getIntent().getStringExtra("voto_estimulado"))
+            intent.putStringArrayListExtra(
+                "problemas",
+                arrayListOf(spinnerProblema.selectedItem.toString())
+            )
+            startActivity(intent)
+        }
     }
 }
