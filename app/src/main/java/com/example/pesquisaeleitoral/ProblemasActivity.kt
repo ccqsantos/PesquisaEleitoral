@@ -30,7 +30,7 @@ class ProblemasActivity : AppCompatActivity() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerProblema.adapter = adapter
 
-        findViewById<Button>(R.id.btEnviar3).setOnClickListener {
+        findViewById<Button>(R.id.btConfirmar).setOnClickListener {
             val intent = Intent(this, DadosdoUserActivity::class.java)
             intent.putExtra("voto_aberto", getIntent().getStringExtra("voto_aberto"))
             intent.putExtra("voto_estimulado", getIntent().getStringExtra("voto_estimulado"))
