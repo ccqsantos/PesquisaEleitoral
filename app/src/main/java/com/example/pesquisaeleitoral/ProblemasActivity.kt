@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import kotlin.jvm.java
 
 class ProblemasActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
@@ -31,7 +32,7 @@ class ProblemasActivity : AppCompatActivity() {
         spinnerProblema.adapter = adapter
 
         findViewById<Button>(R.id.btConfirmar).setOnClickListener {
-            val intent = Intent(this, DadosdoUserActivity::class.java)
+            val intent = Intent(this, UserData::class.java)
             intent.putExtra("voto_aberto", getIntent().getStringExtra("voto_aberto"))
             intent.putExtra("voto_estimulado", getIntent().getStringExtra("voto_estimulado"))
             intent.putStringArrayListExtra(

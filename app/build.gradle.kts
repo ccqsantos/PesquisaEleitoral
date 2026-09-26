@@ -36,6 +36,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.play.services.location)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)

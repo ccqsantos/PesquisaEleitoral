@@ -24,7 +24,7 @@
         android:layout_marginStart="100dp"
         android:layout_marginTop="20dp"
         android:ems="10"
-        android:inputType="text"
+        android:inputType="textPassword"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
@@ -42,9 +42,20 @@
         android:id="@+id/btLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="24dp"
         android:text="Login"
-        tools:layout_editor_absoluteX="100dp"
-        tools:layout_editor_absoluteY="556dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inSenha" />
+
+    <Button
+        android:id="@+id/btFinalizar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="Finalizar"
+        app:layout_constraintStart_toEndOf="@+id/btLogin"
+        app:layout_constraintTop_toTopOf="@+id/btLogin" />
 
     <TextView
         android:id="@+id/textView2"
@@ -55,14 +66,6 @@
         android:text="Senha"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/inLogin" />
-
-    <Button
-        android:id="@+id/btFinalizar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Finalizar"
-        tools:layout_editor_absoluteX="208dp"
-        tools:layout_editor_absoluteY="556dp" />
 
     <EditText
         android:id="@+id/inLogin"
