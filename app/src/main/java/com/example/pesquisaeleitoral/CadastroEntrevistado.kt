@@ -99,7 +99,7 @@ class CadastroEntrevistado : AppCompatActivity() {
         )
         lifecycleScope.launch {
             AppDatabase.getInstance(this@CadastroEntrevistado).entrevistadoDao().inserir(entrevistado)
-            startActivity(Intent(this@CadastroEntrevistado, LoginActivity::class.java).apply {
+            startActivity(Intent(this@CadastroEntrevistado, PesquisaAbertaActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             })
             finish()

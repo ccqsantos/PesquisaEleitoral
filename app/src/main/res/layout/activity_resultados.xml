@@ -9,12 +9,13 @@
 
     <TextView
         android:id="@+id/textView15"
-        android:layout_width="378dp"
-        android:layout_height="60dp"
-        android:layout_marginStart="17dp"
-        android:layout_marginTop="49dp"
+        android:layout_width="399dp"
+        android:layout_height="57dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="28dp"
+        android:gravity="center"
         android:text="RESULTADOS DA PESQUISA"
-        android:textSize="30sp"
+        android:textSize="28sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

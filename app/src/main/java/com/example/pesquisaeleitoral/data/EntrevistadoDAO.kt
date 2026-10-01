@@ -20,6 +20,20 @@ interface EntrevistadoDAO {
     @Query("SELECT votoEstimulado as candidato, COUNT(*) as votos FROM entrevistados GROUP BY votoEstimulado ORDER BY votos DESC")
     suspend fun contarVotosPorCandidato(): List<VotoCount>
 
+    @Query("""
+        SELECT votoAberto AS candidato, COUNT(*) AS votos 
+        FROM entrevistados 
+        GROUP BY votoAberto 
+        ORDER BY votos DESC""")
+    suspend fun contarVotosAbertoPorCandidato(): List<VotoCount>
+
+    @Query("""
+    SELECT COUNT(*)
+    FROM entrevistados
+    WHERE problemas LIKE '%' || :problema || '%'
+""")
+    suspend fun contarPorProblema(problema: String): Int
+
     @Query("DELETE FROM entrevistados")
     suspend fun limparTudo()
 }
