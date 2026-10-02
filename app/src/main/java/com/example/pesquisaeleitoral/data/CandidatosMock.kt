@@ -1,21 +1,21 @@
 // app/src/main/java/com/example/pesquisaeleitoral/data/CandidatosMock.kt
 package com.example.pesquisaeleitoral.data
-
+import com.example.pesquisaeleitoral.R
 object CandidatosMock {
     fun listar(): List<Candidato> = listOf(
-        Candidato("Julio Campos", "Partido A"),
-        Candidato("João Campos", "Partido B"),
-        Candidato("Fábio Pecorito", "Partido C"),
-        Candidato("Guilherme Lollos", "Partido D"),
-        Candidato("José Saramago", "Partido E"),
-        Candidato("Júlia Pacata", "Partido F"),
-        Candidato("Mário Andrade", "Partido G"),
-        Candidato("João Pedro da Penha", "Partido H"),
-        Candidato("Beatriz Sousa", "Partido I"),
-        Candidato("Maciel Marcio Tulio", "Partido J"),
-        Candidato("Jorge José", "Partido K"),
-        Candidato("Branco", ""),
-        Candidato("Nulo", ""),
-        Candidato("Não Sei", "")
+        Candidato("Julio Campos", "Partido A", R.drawable.candidato1),
+        Candidato("João Campos", "Partido B",R.drawable.candidato2),
+        Candidato("Fábio Pecorito", "Partido C",R.drawable.candidato3),
+        Candidato("Guilherme Lollos", "Partido D", R.drawable.candidato5),
+        Candidato("José Saramago", "Partido E", R.drawable.candidato6),
+        Candidato("Júlia Pacata", "Partido F", R.drawable.candidato4),
+        Candidato("Mário Andrade", "Partido G", R.drawable.candidato9),
+        Candidato("João Pedro da Penha", "Partido H", R.drawable.candidato8),
+        Candidato("Beatriz Sousa", "Partido I", R.drawable.candidato7),
+        Candidato("Maciel Marcio Tulio", "Partido J", R.drawable.candidato10),
+        Candidato("Jorge José", "Partido K", R.drawable.candidato11),
+        Candidato("Branco", "", R.drawable.blank),
+        Candidato("Nulo", "", R.drawable.blank),
+        Candidato("Não Sei", "", R.drawable.blank)
     )
 }

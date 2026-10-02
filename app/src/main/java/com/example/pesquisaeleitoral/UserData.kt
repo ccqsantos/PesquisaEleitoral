@@ -50,7 +50,7 @@ class UserData : AppCompatActivity() {
             )
             lifecycleScope.launch {
                 AppDatabase.getInstance(this@UserData).entrevistadoDao().inserir(entrevistado)
-                startActivity(Intent(this@UserData, LoginActivity::class.java).apply {
+                startActivity(Intent(this@UserData, PesquisaAbertaActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                 })
                 finish()
