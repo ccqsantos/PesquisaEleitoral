@@ -4,6 +4,7 @@ package com.example.pesquisaeleitoral
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +23,17 @@ class ResultadosActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        val totalEntrevistados = findViewById<TextView>(R.id.totalEntrevistados2)
+
+        lifecycleScope.launch {
+            val dao = AppDatabase
+                .getInstance(this@ResultadosActivity)
+                .entrevistadoDao()
+
+            val total = dao.contarTotal()
+            totalEntrevistados.text = total.toString()
         }
 
         findViewById<Button>(R.id.btEleitores).setOnClickListener {
