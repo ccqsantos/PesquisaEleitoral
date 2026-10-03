@@ -1,21 +1,33 @@
 package com.example.pesquisaeleitoral
 
 import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.pesquisaeleitoral.data.AppDatabase
+import com.example.pesquisaeleitoral.data.VotoCount
+import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import kotlinx.coroutines.launch
-import androidx.core.graphics.toColorInt
 
 class DadosActivity : AppCompatActivity() {
 
@@ -24,8 +36,8 @@ class DadosActivity : AppCompatActivity() {
         "Agricultura", "Pecuária", "Extrativismo"
     )
 
-    // Paleta fixa para os candidatos — cores bem distintas
-    private val coresCandidatos = intArrayOf(
+    // Paleta fixa — cores bem distintas (usada em candidatos e problemas)
+    private val paleta = intArrayOf(
         "#1E88E5".toColorInt(), // azul
         "#E53935".toColorInt(), // vermelho
         "#43A047".toColorInt(), // verde
@@ -33,10 +45,14 @@ class DadosActivity : AppCompatActivity() {
         "#8E24AA".toColorInt(), // roxo
         "#00ACC1".toColorInt(), // ciano
         "#FDD835".toColorInt(), // amarelo
-        "#6D4C41".toColorInt(), //marrom
-        "#3949AB".toColorInt(), //indigo
+        "#6D4C41".toColorInt(), // marrom
+        "#3949AB".toColorInt(), // indigo
         "#D81B60".toColorInt(), // rosa
     )
+
+    private fun corDe(index: Int) = paleta[index % paleta.size]
+
+    private fun Int.dp() = (this * resources.displayMetrics.density).toInt()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,10 +71,11 @@ class DadosActivity : AppCompatActivity() {
         }
 
         val totalEntrevistados = findViewById<TextView>(R.id.totalEntrevistados)
-        val dadosPesquisa = findViewById<TextView>(R.id.dadosPesquisa)
-        val dadosVotoAberto = findViewById<TextView>(R.id.dadosVotoAberto)
-        val dadosProblemas = findViewById<TextView>(R.id.dadosProblemas)
+        val containerCandidatos = findViewById<LinearLayout>(R.id.containerCandidatos)
+        val containerVotoAberto = findViewById<LinearLayout>(R.id.containerVotoAberto)
+        val containerProblemas = findViewById<LinearLayout>(R.id.containerProblemas)
         val graficoVotos = findViewById<PieChart>(R.id.graficoVotos)
+        val graficoProblemas = findViewById<HorizontalBarChart>(R.id.graficoProblemas)
 
         lifecycleScope.launch {
             val dao = AppDatabase
@@ -67,62 +84,115 @@ class DadosActivity : AppCompatActivity() {
 
             val total = dao.contarTotal()
             totalEntrevistados.text = total.toString()
+
+            // Votos estimulados (gráfico + lista com cores)
             val votosEstimulado = dao.contarVotosPorCandidato()
             configurarGrafico(graficoVotos, votosEstimulado)
-            dadosPesquisa.text = if (votosEstimulado.isEmpty()) {
-                "Nenhum voto registrado"
+            containerCandidatos.removeAllViews()
+            if (votosEstimulado.isEmpty()) {
+                adicionarLinha(containerCandidatos, "Nenhum voto registrado", "", null)
             } else {
-                votosEstimulado.joinToString("\n") { item ->
+                votosEstimulado.forEachIndexed { index, item ->
                     val pct = if (total > 0) item.votos * 100.0 / total else 0.0
-                    "${item.candidato}: ${item.votos} (%.1f%%)".format(pct)
-                }
-            }
-            val votosAberto = dao.contarVotosAbertoPorCandidato()
-            dadosVotoAberto.text = if (votosAberto.isEmpty()) {
-                "Nenhum voto registrado"
-            } else {
-                votosAberto.joinToString("\n") { item ->
-                    val pct = if (total > 0) item.votos * 100.0 / total else 0.0
-                    "${item.candidato}: ${item.votos} (%.1f%%)".format(pct)
+                    adicionarLinha(
+                        containerCandidatos,
+                        item.candidato,
+                        "${item.votos} (%.1f%%)".format(pct),
+                        corDe(index)
+                    )
                 }
             }
 
+            // Votos em aberto (sem cor)
+            val votosAberto = dao.contarVotosAbertoPorCandidato()
+            containerVotoAberto.removeAllViews()
+            if (votosAberto.isEmpty()) {
+                adicionarLinha(containerVotoAberto, "Nenhum voto registrado", "", null)
+            } else {
+                votosAberto.forEach { item ->
+                    val pct = if (total > 0) item.votos * 100.0 / total else 0.0
+                    adicionarLinha(
+                        containerVotoAberto,
+                        item.candidato,
+                        "${item.votos} (%.1f%%)".format(pct),
+                        null
+                    )
+                }
+            }
+
+            // Problemas (gráfico + lista com cores)
             val contagens = mutableListOf<Pair<String, Int>>()
             for (p in problemas) {
                 val qtd = dao.contarPorProblema(p)
                 if (qtd > 0) contagens.add(p to qtd)
             }
             contagens.sortByDescending { it.second }
+            configurarGraficoProblemas(graficoProblemas, contagens)
 
-            dadosProblemas.text = if (contagens.isEmpty()) {
-                "Nenhum problema registrado"
+            containerProblemas.removeAllViews()
+            if (contagens.isEmpty()) {
+                adicionarLinha(containerProblemas, "Nenhum problema registrado", "", null)
             } else {
-                contagens.joinToString("\n") { (problema, votos) ->
-                    "$problema: $votos"
+                contagens.forEachIndexed { index, (problema, qtd) ->
+                    adicionarLinha(containerProblemas, problema, qtd.toString(), corDe(index))
                 }
             }
         }
     }
-    private fun configurarGrafico(
-        grafico: PieChart,
-        votos: List<com.example.pesquisaeleitoral.data.VotoCount>
-    ) {
+
+    // Linha: [bolinha colorida] nome ............ valor (negrito)
+    private fun adicionarLinha(container: LinearLayout, nome: String, valor: String, cor: Int?) {
+        val linha = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(0, 6.dp(), 0, 6.dp())
+        }
+
+        if (cor != null) {
+            val bolinha = View(this).apply {
+                background = GradientDrawable().apply {
+                    shape = GradientDrawable.OVAL
+                    setColor(cor)
+                }
+                layoutParams = LinearLayout.LayoutParams(14.dp(), 14.dp()).apply {
+                    marginEnd = 12.dp()
+                }
+            }
+            linha.addView(bolinha)
+        }
+
+        val txtNome = TextView(this).apply {
+            text = nome
+            textSize = 16f
+            layoutParams = LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f
+            )
+        }
+
+        val txtValor = TextView(this).apply {
+            text = valor
+            textSize = 16f
+            setTypeface(typeface, Typeface.BOLD)
+        }
+
+        linha.addView(txtNome)
+        linha.addView(txtValor)
+        container.addView(linha)
+    }
+
+    private fun configurarGrafico(grafico: PieChart, votos: List<VotoCount>) {
         if (votos.isEmpty()) {
             grafico.clear()
             grafico.invalidate()
             return
         }
 
-        // Uma entrada por candidato
         val entradas = votos.map { item ->
             PieEntry(item.votos.toFloat(), item.candidato)
         }
 
         val dataSet = PieDataSet(entradas, "Votos").apply {
-            // Cor distinta para cada fatia (cicla a paleta se houver mais candidatos que cores)
-            colors = votos.mapIndexed { index, _ ->
-                coresCandidatos[index % coresCandidatos.size]
-            }
+            colors = votos.mapIndexed { index, _ -> corDe(index) }
             sliceSpace = 3f
             setDrawValues(true)
             valueTextSize = 12f
@@ -130,12 +200,8 @@ class DadosActivity : AppCompatActivity() {
             valueFormatter = PercentFormatter(grafico)
         }
 
-        val pieData = PieData(dataSet).apply {
-            setValueTextSize(12f)
-        }
-
         grafico.apply {
-            data = pieData
+            data = PieData(dataSet)
             description.isEnabled = false
             isDrawHoleEnabled = true
             holeRadius = 45f
@@ -143,12 +209,53 @@ class DadosActivity : AppCompatActivity() {
             setUsePercentValues(true)
             centerText = "Votos"
             setCenterTextSize(16f)
-            setEntryLabelColor(Color.BLACK)
-            setEntryLabelTextSize(12f)
-            legend.isEnabled = true
-            legend.textSize = 12f
-            legend.isWordWrapEnabled = true
-            setDrawEntryLabels(true)
+            setDrawEntryLabels(false)
+            legend.isEnabled = false // a legenda é a lista colorida abaixo do gráfico
+            invalidate()
+        }
+    }
+
+    private fun configurarGraficoProblemas(
+        grafico: HorizontalBarChart,
+        contagens: List<Pair<String, Int>>
+    ) {
+        if (contagens.isEmpty()) {
+            grafico.clear()
+            grafico.invalidate()
+            return
+        }
+
+        // No gráfico horizontal o índice 0 fica embaixo; inverte para o mais citado ficar no topo
+        val ordenado = contagens.reversed()
+        val cores = contagens.indices.map { corDe(it) }.reversed()
+
+        val entradas = ordenado.mapIndexed { i, (_, qtd) ->
+            BarEntry(i.toFloat(), qtd.toFloat())
+        }
+
+        val dataSet = BarDataSet(entradas, "Problemas").apply {
+            colors = cores
+            valueTextSize = 12f
+            valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float) = value.toInt().toString()
+            }
+        }
+
+        val maximo = contagens.maxOf { it.second }
+
+        grafico.apply {
+            data = BarData(dataSet).apply { barWidth = 0.6f }
+            description.isEnabled = false
+            legend.isEnabled = false // nomes ficam na lista colorida abaixo
+            setScaleEnabled(false)
+            setDrawGridBackground(false)
+            xAxis.isEnabled = false // sem rótulos laterais, evita corte
+            axisLeft.apply {
+                axisMinimum = 0f
+                axisMaximum = maximo + 0.6f // folga para o número no fim da barra
+                isEnabled = false
+            }
+            axisRight.isEnabled = false
             invalidate()
         }
     }
